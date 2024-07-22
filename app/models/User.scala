@@ -4,10 +4,17 @@ import play.api.libs.json._
 import slick.jdbc.PostgresProfile.api._
 import slick.lifted.{ProvenShape, Tag}
 
+import scala.util.matching.Regex
+
 // User case class
 case class User(id: Option[Long], username: String, email: String, password: String) {
   def isValid: Boolean = {
-    username.nonEmpty
+    val pattern = new Regex(".+@example\\.com$")
+    (username.isEmpty, pattern.findFirstMatchIn(email)) match {
+      case (true, _) => false
+      case (_, None) => false
+      case _ => true
+    }
   }
 }
 
