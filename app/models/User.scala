@@ -5,7 +5,12 @@ import slick.jdbc.PostgresProfile.api._
 import slick.lifted.{ProvenShape, Tag}
 
 // User case class
-case class User(id: Option[Long], username: String, email: String, password: String)
+case class User(id: Option[Long], username: String, email: String, password: String) {
+  def isValid: Boolean = {
+    username.nonEmpty
+  }
+}
+
 
 // Companion object for User
 object User {

@@ -33,12 +33,17 @@ class UserController @Inject()(cc: ControllerComponents, userDAO: UserDAO)(impli
     val password = (json \ "password").as[String]
 
     val user = User(None, username, email, password)
-
-    userDAO.addUser(user).map { id =>
-      Created(Json.obj("status" -> "success", "message" -> s"User $id created"))
-    }.recover {
-      case _ => InternalServerError(Json.obj("status" -> "error", "message" -> "User could not be created"))
+    if (user.isValid) {
+      userDAO.addUser(user).map { id =>
+        Created(Json.obj("status" -> "success", "message" -> s"User $id created"))
+      }.recover {
+        case _ => InternalServerError(Json.obj("status" -> "error", "message" -> "User could not be created"))
+      }
+    } else {
+      Future.successful(BadRequest("Invalid username"))
     }
+
+
   }
 
   def logIn = Action.async(parse.json) { implicit request =>
@@ -51,4 +56,5 @@ class UserController @Inject()(cc: ControllerComponents, userDAO: UserDAO)(impli
         }
     }.getOrElse(Future.successful(BadRequest("Invalid login data")))
   }
-}
+
+ }
