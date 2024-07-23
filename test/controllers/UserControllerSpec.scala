@@ -2,11 +2,14 @@ package controllers
 
 import daos.UserDAO
 import models.Users
+import org.scalatest.BeforeAndAfterEach
 import org.scalatest.prop.TableDrivenPropertyChecks.forAll
 import org.scalatest.prop.Tables.Table
 import org.scalatestplus.play._
 import org.scalatestplus.play.guice._
 import play.api.Play.materializer
+import play.api.db.evolutions.Evolutions
+import play.api.db.{DBApi, Database}
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Json
@@ -19,7 +22,19 @@ import slick.lifted.TableQuery
 
 import scala.concurrent.ExecutionContext
 
-class UserControllerSpec extends PlaySpec with GuiceOneAppPerTest with Injecting {
+class UserControllerSpec
+  extends PlaySpec
+    with GuiceOneAppPerTest
+    with Injecting
+    with BeforeAndAfterEach {
+
+    override def beforeEach(): Unit = {
+      val app = new GuiceApplicationBuilder().build()
+      val dbApi: DBApi = app.injector.instanceOf[DBApi]
+      val database: Database = dbApi.database("default")
+      Evolutions.cleanupEvolutions(database)
+      Evolutions.applyEvolutions(database)
+    }
 
   "UserController POST /signUp" should {
 
