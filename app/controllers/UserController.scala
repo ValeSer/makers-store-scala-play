@@ -40,7 +40,7 @@ class UserController @Inject()(cc: ControllerComponents, userDAO: UserDAO)(impli
         case _ => InternalServerError(Json.obj("status" -> "error", "message" -> "User could not be created"))
       }
     } else {
-      Future.successful(BadRequest("Invalid username"))
+      Future.successful(BadRequest("Invalid data"))
     }
 
 
