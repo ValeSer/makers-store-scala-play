@@ -10,9 +10,10 @@ import scala.util.matching.Regex
 case class User(id: Option[Long], username: String, email: String, password: String) {
   def isValid: Boolean = {
     val pattern = new Regex(".+@example\\.com$")
-    (username.isEmpty, pattern.findFirstMatchIn(email)) match {
-      case (true, _) => false
-      case (_, None) => false
+    (username.isEmpty, pattern.findFirstMatchIn(email), password.length < 8) match {
+      case (true, _, _) => false
+      case (_, None, _) => false
+      case (_, _, true) => false
       case _ => true
     }
   }

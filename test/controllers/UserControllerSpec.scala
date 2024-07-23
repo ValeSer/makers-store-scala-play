@@ -51,7 +51,8 @@ class UserControllerSpec extends PlaySpec with GuiceOneAppPerTest with Injecting
     val invalidDataTable = Table(
       ("username","email", "password"),
       ("", "test@example.com", "12345678"),
-      ("usernameTest","notAnEmail", "12345678")
+      ("usernameTest","notAnEmail", "12345678"),
+      ("usernameTest", "test@example.com", "1234567"),
 
     )
     "return bad request for invalid data" in {
