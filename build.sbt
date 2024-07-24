@@ -25,3 +25,5 @@ Test / javaOptions ++= Seq("-Dconfig.file=conf/test.conf")
 
 // Adds additional packages into conf/routes
 // play.sbt.routes.RoutesKeys.routesImport += "com.makers.binders._"
+
+libraryDependencies += "org.scalatestplus" %% "selenium-4-21" % "3.2.19.0" % "test"
