@@ -42,8 +42,6 @@ class UserController @Inject()(cc: ControllerComponents, userDAO: UserDAO)(impli
     } else {
       Future.successful(BadRequest("Invalid data"))
     }
-
-
   }
 
   def logIn = Action.async(parse.json) { implicit request =>
@@ -51,10 +49,31 @@ class UserController @Inject()(cc: ControllerComponents, userDAO: UserDAO)(impli
       case (username, password) =>
         userDAO.findUserByUsername(username).map {
           case Some(user) if BCrypt.checkpw(password, user.password) =>
-            Ok(Json.obj("status" -> "success", "message" -> "Logged in"))
+            val sessionId = java.util.UUID.randomUUID().toString
+            DummySessionStorage.store(sessionId, username)
+            Ok(Json.obj("status" -> "success", "message" -> "Logged in")).withSession("sessionId" -> sessionId)
           case _ => Unauthorized(Json.obj("status" -> "error", "message" -> "Invalid credentials"))
         }
     }.getOrElse(Future.successful(BadRequest("Invalid login data")))
   }
 
+  object DummySessionStorage {
+    private var sessions: Map[String, String] = Map()
+
+    def store(sessionId: String, username: String): Unit = {
+      sessions += (sessionId -> username)
+    }
+
+    def remove(sessionId: String): Unit = {
+      sessions -= sessionId
+    }
+
+    def exists(sessionId: String): Boolean = {
+      sessions.contains(sessionId)
+    }
+
+    def getUsername(sessionId: String): Option[String] = {
+      sessions.get(sessionId)
+    }
+  }
  }
