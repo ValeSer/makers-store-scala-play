@@ -57,6 +57,23 @@ class UserController @Inject()(cc: ControllerComponents, userDAO: UserDAO)(impli
     }.getOrElse(Future.successful(BadRequest("Invalid login data")))
   }
 
+//  def authenticatedAction(action: Action[AnyContent]): Action[AnyContent] = Action.async { implicit request =>
+//    request.session.get("sessionId") match {
+//      case Some(sessionId) if DummySessionStorage.exists(sessionId) =>
+//        action(request)
+//      case _ =>
+//        Future.successful(Unauthorized(Json.obj("status" -> "error", "message" -> "Unauthorized")))
+//    }
+//  }
+
+  def logOut = Action { implicit request =>
+    request.session.get("sessionId").foreach { sessionId =>
+      // Remove the session from your session storage
+      DummySessionStorage.remove(sessionId)
+    }
+    Ok(Json.obj("status" -> "success", "message" -> "Logged out")).withNewSession
+  }
+
   object DummySessionStorage {
     private var sessions: Map[String, String] = Map()
 
